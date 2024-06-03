@@ -9,3 +9,6 @@ def unzip_files(source_dir):
                 zip_ref.extractall(extract_to_path)
             os.remove(file_path)
             flatten_directory_structure(extract_to_path)
+
+
+print()
