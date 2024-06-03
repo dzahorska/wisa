@@ -20,15 +20,15 @@ def unzip_files(source_dir):
 
 def flatten_directory_structure(directory):
     """Move all files from subfolders to the main directory and remove empty subfolders."""
-    for root, dirs, files in os.walk(directory, topdown=False):  # Start from the deepest level
+    for root, dirs, files in os.walk(directory, topdown=False):
         for name in files:
             file_path = os.path.join(root, name)
             if root != directory:
-                shutil.move(file_path, os.path.join(directory, name))  # Move files to the main directory
+                shutil.move(file_path, os.path.join(directory, name))
         for name in dirs:
             dir_path = os.path.join(root, name)
-            if os.listdir(dir_path) == []:  # Check if the directory is empty now
-                os.rmdir(dir_path)  # Remove the empty directory
+            if os.listdir(dir_path) == []:
+                os.rmdir(dir_path)
 
 
 def clear_directory(directory):
@@ -60,7 +60,6 @@ def process_file_by_timestamp(file_path, timestamps, output_dir):
         return  # Skip this file if no valid timestamp column is found
 
     # Process each timestamp range
-
     last_end_time = None
     # Process each timestamp range
     trial_index = 1

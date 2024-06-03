@@ -7,11 +7,10 @@ from datetime import datetime
 def is_timestamp_in_correct_format(timestamp):
     try:
         if isinstance(timestamp, float) or isinstance(timestamp, int):
-            # Convert numeric timestamps to datetime to check format
-            datetime.fromtimestamp(timestamp)  # This line checks if the timestamp is in seconds since epoch
-            return False  # Indicates it's a numeric timestamp not in human-readable format
+            datetime.fromtimestamp(timestamp)
+            return False
         elif re.match(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', str(timestamp)):
-            return True  # Matches human-readable format
+            return True
         else:
             return False
     except:
