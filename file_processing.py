@@ -106,4 +106,3 @@ def read_timestamps(timestamps_file):
                 end = datetime.strptime(parts[1].strip(), '%Y-%m-%d %H:%M:%S')
                 timestamps.append((start, end))
     return timestamps
-
