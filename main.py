@@ -11,7 +11,6 @@ def main():
         output_dir = os.path.join(base_dir, 'output')
         timestamps_file = os.path.join(base_dir, 'timestamps.txt')
         timestamps = read_timestamps(timestamps_file)
-
         unzip_files(raw_dir)
         process_directory_for_conversion(raw_dir)
         process_directory_by_timestamps(raw_dir, timestamps, output_dir)
