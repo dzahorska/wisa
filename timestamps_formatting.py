@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import pytz
 import re
 from datetime import datetime
 
@@ -7,10 +8,11 @@ from datetime import datetime
 def is_timestamp_in_correct_format(timestamp):
     try:
         if isinstance(timestamp, float) or isinstance(timestamp, int):
-            datetime.fromtimestamp(timestamp)
-            return False
+            # Convert numeric timestamps to datetime to check format
+            datetime.fromtimestamp(timestamp)  # This line checks if the timestamp is in seconds since epoch
+            return False  # Indicates it's a numeric timestamp not in human-readable format
         elif re.match(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', str(timestamp)):
-            return True
+            return True  # Matches human-readable format
         else:
             return False
     except:
@@ -41,7 +43,7 @@ def read_and_convert(file_path, time_unit, delimiter=',', expected_headers=None,
             df = pd.read_csv(file_path, delimiter=delimiter, header=header_row)
 
             possible_timestamp_columns = ['start timestamp [ns]', 'timestamp', 'Timestamp', 'Phone timestamp',
-                                          'timestamp_unix', 'timestamp [ns]', 'TimeStamp']
+                                          'timestamp_unix', 'timestamp [ns]', 'TimeStamp', 'unix_timestamp']
             timestamp_column = next((col for col in possible_timestamp_columns if col in df.columns), None)
 
             if timestamp_column:
@@ -73,10 +75,16 @@ def process_directory(base_dir):
             if file.endswith(('.csv', '.txt')) and not file.startswith('.') and not file.startswith('enrichment_info') \
                     and not file.startswith('sections'):
                 file_path = os.path.join(root, file)
-                unit = 's' if 'tracklog' in file or file.startswith('tracklog') else 'ns'
+                if 'tracklog' in file or file.startswith('tracklog'):
+                    unit = 's'
+                elif 'eda' in file or 'temperature' in file:
+                    unit = 'us'
+                else:
+                    unit = 'ns'
                 delimiter = ';' if file.endswith('.txt') else ','  # Adjust delimiter based on your file's format
                 expected_headers = [
                     'Timestamp', 'Latitude', 'Longitude', 'Altitude', 'Course', 'Speed',
                     'Bank', 'Pitch', 'Horizontal Error', 'Vertical Error', 'g Load'
                 ] if 'tracklog' in file or file.startswith('tracklog') else None
                 read_and_convert(file_path, unit, delimiter, expected_headers)
+
