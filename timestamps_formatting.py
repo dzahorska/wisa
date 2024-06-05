@@ -47,21 +47,20 @@ def read_and_convert(file_path, time_unit, delimiter=',', expected_headers=None,
             timestamp_column = next((col for col in possible_timestamp_columns if col in df.columns), None)
 
             if timestamp_column:
-                first_entry = df[timestamp_column].dropna().iloc[0]
-
-                if is_timestamp_in_correct_format(first_entry):
-                    print(f"Skipping {file_path}, timestamps are already in the correct format.")
-                    return
-
-                # Convert all timestamps in the column
-                df[timestamp_column] = pd.to_datetime(df[timestamp_column], unit=time_unit, utc=True)
-                if 'txt' in file_path:
-                    df[timestamp_column] = df[timestamp_column].dt.strftime('%Y-%m-%d %H:%M:%S')
+                converted_column_name = f'{timestamp_column}_converted'
+                if converted_column_name in df.columns:
+                    first_entry = df[converted_column_name].dropna().iloc[0]
+                    if is_timestamp_in_correct_format(first_entry):
+                        print(f"Skipping conversion for {timestamp_column} in {file_path}, already converted.")
                 else:
-                    df[timestamp_column] = df[timestamp_column].dt.tz_convert(timezone).dt.tz_localize(None)
+                    df[converted_column_name] = pd.to_datetime(df[timestamp_column], unit=time_unit, utc=True)
+                    if 'txt' in file_path:
+                        df[converted_column_name] = df[converted_column_name].dt.strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        df[converted_column_name] = df[converted_column_name].dt.tz_convert(timezone).dt.tz_localize(None)
 
-                df.to_csv(file_path, index=False)
-                print(f"Processed and saved {file_path} with timezone conversion and formatting.")
+                    df.to_csv(file_path, index=False)
+                    print(f"Processed and saved {file_path} with timezone conversion and formatting.")
             else:
                 print(f"No timestamp column found in {file_path}")
     except Exception as e:
@@ -79,6 +78,8 @@ def process_directory(base_dir):
                     unit = 's'
                 elif 'eda' in file or 'temperature' in file:
                     unit = 'us'
+                elif 'metadata' in file:
+                    unit = 'ms'
                 else:
                     unit = 'ns'
                 delimiter = ';' if file.endswith('.txt') else ','  # Adjust delimiter based on your file's format
@@ -87,4 +88,3 @@ def process_directory(base_dir):
                     'Bank', 'Pitch', 'Horizontal Error', 'Vertical Error', 'g Load'
                 ] if 'tracklog' in file or file.startswith('tracklog') else None
                 read_and_convert(file_path, unit, delimiter, expected_headers)
-

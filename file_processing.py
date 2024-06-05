@@ -98,12 +98,13 @@ def process_file_by_timestamp(file_path, timestamps, output_dir):
         return  # Skip this file if no valid timestamp column is found
 
     # Process each timestamp range
-
-    last_end_time = None
-    # Process each timestamp range
     trial_index = 1
     for (start, end) in timestamps:
-        mask = (pd.to_datetime(df[timestamp_column]) >= start) & (pd.to_datetime(df[timestamp_column]) <= end)
+        if os.path.basename(file_path).startswith('mindMonitor'):
+            timestamp_column_converted = timestamp_column
+        else:
+            timestamp_column_converted = f'{timestamp_column}_converted'
+        mask = (pd.to_datetime(df[timestamp_column_converted]) >= start) & (pd.to_datetime(df[timestamp_column_converted]) <= end)
         filtered_data = df.loc[mask]
         if not filtered_data.empty:
             trial_dir = os.path.join(output_dir, f'trial{trial_index}')
@@ -111,17 +112,6 @@ def process_file_by_timestamp(file_path, timestamps, output_dir):
             filtered_data.to_csv(os.path.join(trial_dir, os.path.basename(file_path)), index=False)
             print(f"Processed and saved data for trial {trial_index} in {file_path}.")
             trial_index += 1
-        last_end_time = end
-
-    # Handle remaining data beyond last timestamp
-    if last_end_time:
-        remaining_mask = pd.to_datetime(df[timestamp_column]) > last_end_time
-        remaining_data = df.loc[remaining_mask]
-        if not remaining_data.empty:
-            remaining_trial_dir = os.path.join(output_dir, f'trial{trial_index}')
-            os.makedirs(remaining_trial_dir, exist_ok=True)
-            remaining_data.to_csv(os.path.join(remaining_trial_dir, os.path.basename(file_path)), index=False)
-            print(f"Processed and saved remaining data in {remaining_trial_dir}.")
 
 
 def process_directory_by_timestamps(data_dir, timestamps, output_dir):
@@ -129,7 +119,7 @@ def process_directory_by_timestamps(data_dir, timestamps, output_dir):
     """Process all CSV and TXT files within a directory according to the provided timestamps."""
     for root, dirs, files in os.walk(data_dir):
         for file_name in files:
-            if file_name.endswith(('.csv', '.txt')) and not file_name.startswith('.'):
+            if file_name.endswith(('.csv', '.txt')) and not file_name.startswith('.') and 'metadata' not in file_name:
                 file_path = os.path.join(root, file_name)
                 process_file_by_timestamp(file_path, timestamps, output_dir)
 
@@ -145,4 +135,3 @@ def read_timestamps(timestamps_file):
                 end = datetime.strptime(parts[1].strip(), '%Y-%m-%d %H:%M:%S')
                 timestamps.append((start, end))
     return timestamps
-
