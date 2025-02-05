@@ -7,6 +7,7 @@ conn = mysql.connector.connect(
     database="research_db"
 )
 
+
 cursor = conn.cursor()
 
 
