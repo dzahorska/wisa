@@ -1,5 +1,6 @@
 from timestamps_formatting import process_directory as process_directory_for_conversion
 from file_processing import unzip_files, process_directory_by_timestamps, read_timestamps, avro_conversion
+from data_processing import Blinks, insert_data
 import os
 
 
@@ -21,6 +22,10 @@ import os
 #         process_directory_for_conversion(raw_dir)
 #         process_directory_by_timestamps(raw_dir, timestamps, output_dir)
 
+TABLE_MAPPING = {
+    "blinks.csv": Blinks
+}
+
 def main():
     numbers_pilots = [47, 86]
     for n in numbers_pilots:
@@ -33,12 +38,17 @@ def main():
         trial_folders = [d for d in os.listdir(output_dir)]
 
         result = {}
-        for d in os.listdir(output_dir):
-            dir_path = os.path.join(output_dir, d)
+        for trial_number in os.listdir(output_dir):
+            dir_path = os.path.join(output_dir, trial_number)
             if os.path.isdir(dir_path):  # Check if it's a directory
-                result[d] = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
+                for f in os.listdir(dir_path):
+                    if "blinks.csv" in f:
+                        print("INSIDE IF")
+                        full_path = os.path.join(dir_path, f)
+                        print("FULLL PATH")
+                        insert_data(full_path, n, trial_number, Blinks)
 
-        print(n, result)
+
 
 
 if __name__ == '__main__':
