@@ -3,7 +3,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 import numpy as np
-
 import glob
 from datetime import datetime
 
@@ -12,6 +11,7 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+''' ORM for Blinks '''
 class Blinks(Base):
     __tablename__ = "blinks"
     id = Column(Integer, primary_key=True, index=True)
@@ -32,6 +32,7 @@ def insert_data(file_path, candidate_number, trial_number, table):
     session = SessionLocal()
     df = pd.read_csv(file_path)
 
+    '''Map the column names to an acceptable my SQL naming convention'''
     column_mapping = {
         "section id": "section_id",
         "recording id": "recording_id",

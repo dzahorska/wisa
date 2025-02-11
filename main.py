@@ -26,26 +26,19 @@ TABLE_MAPPING = {
     "blinks.csv": Blinks
 }
 
+''' MIGRATION FUNCTION '''
 def main():
     numbers_pilots = [47, 86]
     for n in numbers_pilots:
         base_dir = f'/Users/kanishksk/Documents/WISA/{n}'
-        raw_dir = os.path.join(base_dir, 'raw')
         output_dir = os.path.join(base_dir, 'output')
-        timestamps_file = os.path.join(base_dir, 'timestamps.txt')
-        #timestamps = read_timestamps(timestamps_file)
 
-        trial_folders = [d for d in os.listdir(output_dir)]
-
-        result = {}
         for trial_number in os.listdir(output_dir):
             dir_path = os.path.join(output_dir, trial_number)
             if os.path.isdir(dir_path):  # Check if it's a directory
                 for f in os.listdir(dir_path):
                     if "blinks.csv" in f:
-                        print("INSIDE IF")
                         full_path = os.path.join(dir_path, f)
-                        print("FULLL PATH")
                         insert_data(full_path, n, trial_number, Blinks)
 
 
