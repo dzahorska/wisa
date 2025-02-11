@@ -107,18 +107,14 @@ def process_file_by_timestamp(file_path, timestamps, output_dir):
             timestamp_column_converted = f'{timestamp_column}_converted'
         mask = (pd.to_datetime(df[timestamp_column_converted]) >= start) & (pd.to_datetime(df[timestamp_column_converted]) <= end)
         filtered_data = df.loc[mask]
+        os.makedirs(output_dir, exist_ok=True)
         if not filtered_data.empty:
-            trial_dir = os.path.join(output_dir, f'trial{trial_index}')
-            #os.makedirs(trial_dir, exist_ok=True)
-
-            save_dataset(file_path, output_dir, 100, trial_index)
-            # filtered_data.to_csv(os.path.join(trial_dir, os.path.basename(file_path)), index=False)
-            # print(f"Processed and saved data for trial {trial_index} in {file_path}.")
+            db_filename = get_db_filename(file_path, 100, trial_index)
+            filtered_data.to_csv(os.path.join(output_dir, db_filename), index=False)
             trial_index += 1
 
 
-def save_dataset(file_path, output_dir, participant, trial_idx):
-    #print("FILE PATH: ", file_path, trial_idx)
+def get_db_filename(file_path, participant, trial_idx):
     file_map = {
         "eda": "eda",
         "Polar": "polar",
@@ -126,27 +122,31 @@ def save_dataset(file_path, output_dir, participant, trial_idx):
         "tracklog": "tracklog",
         "blinks": "blinks",
         "mindMonitor": "mindMonitor",
-        "labels.csv": "labels",
-        "gaze.csv": "gaze",
+        "labels": "labels",
+        "gaze": "gaze",
         "world": "world_timestamps",
-        "imu.csv": "imu",
-        "blinks.csv": "blinks",
-        "sections.csv": "sections",
+        "imu": "imu",
+        "blinks": "blinks",
+        "sections": "sections",
         "3d": "3d_eye_states",
-        "events.csv": "events",
-        "saccades.csv": "saccades",
+        "events": "events",
+        "saccades": "saccades",
         "enrichment": "enrichement",
-        "fixations.csv": "fixations"
+        "fixations": "fixations"
     }
 
     ''' Grab file name'''
     file_name = file_path.rsplit('/', 1)[-1]
 
-    ''' Some file names have delimiters such as "_" or "-" '''
-    file_map_key = re.split(r'[-_]', file_name)[0]
+    ''' Some file names have delimiters such as "_" or "-" or "." '''
+    paritioned_file_name = re.split(r'[-_.]', file_name)
 
-    print("FILE_MAP_KEY: ", file_map_key)
-    print("FILE_MAP: ", file_map[file_map_key])
+    file_map_key = paritioned_file_name[0]
+    file_extension = paritioned_file_name[-1]
+    db_value = f'{trial_idx}_{participant}_{file_map[file_map_key]}'
+
+
+    return db_value + '.' + file_extension
 
 
 
