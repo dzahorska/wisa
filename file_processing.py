@@ -6,6 +6,7 @@ import pandas as pd
 from avro.datafile import DataFileReader
 from avro.io import DatumReader
 import csv
+import re
 
 
 def unzip_files(source_dir):
@@ -108,10 +109,50 @@ def process_file_by_timestamp(file_path, timestamps, output_dir):
         filtered_data = df.loc[mask]
         if not filtered_data.empty:
             trial_dir = os.path.join(output_dir, f'trial{trial_index}')
-            os.makedirs(trial_dir, exist_ok=True)
-            filtered_data.to_csv(os.path.join(trial_dir, os.path.basename(file_path)), index=False)
-            print(f"Processed and saved data for trial {trial_index} in {file_path}.")
+            #os.makedirs(trial_dir, exist_ok=True)
+
+            save_dataset(file_path, output_dir, 100, trial_index)
+            # filtered_data.to_csv(os.path.join(trial_dir, os.path.basename(file_path)), index=False)
+            # print(f"Processed and saved data for trial {trial_index} in {file_path}.")
             trial_index += 1
+
+
+def save_dataset(file_path, output_dir, participant, trial_idx):
+    #print("FILE PATH: ", file_path, trial_idx)
+    file_map = {
+        "eda": "eda",
+        "Polar": "polar",
+        "temperature": "temperature",
+        "tracklog": "tracklog",
+        "blinks": "blinks",
+        "mindMonitor": "mindMonitor",
+        "labels.csv": "labels",
+        "gaze.csv": "gaze",
+        "world": "world_timestamps",
+        "imu.csv": "imu",
+        "blinks.csv": "blinks",
+        "sections.csv": "sections",
+        "3d": "3d_eye_states",
+        "events.csv": "events",
+        "saccades.csv": "saccades",
+        "enrichment": "enrichement",
+        "fixations.csv": "fixations"
+    }
+
+    ''' Grab file name'''
+    file_name = file_path.rsplit('/', 1)[-1]
+
+    ''' Some file names have delimiters such as "_" or "-" '''
+    file_map_key = re.split(r'[-_]', file_name)[0]
+
+    print("FILE_MAP_KEY: ", file_map_key)
+    print("FILE_MAP: ", file_map[file_map_key])
+
+
+
+    
+
+
 
 
 def process_directory_by_timestamps(data_dir, timestamps, output_dir):
@@ -131,7 +172,7 @@ def read_timestamps(timestamps_file):
         for line in file:
             parts = line.strip().split(',')
             if len(parts) == 2:
-                start = datetime.strptime(parts[0].strip(), '%Y-%m-%d %H:%M:%S')
-                end = datetime.strptime(parts[1].strip(), '%Y-%m-%d %H:%M:%S')
+                start = datetime.strptime(parts[0].strip(), '%Y-%m-%d %H:%M:%S.%f')
+                end = datetime.strptime(parts[1].strip(), '%Y-%m-%d %H:%M:%S.%f')
                 timestamps.append((start, end))
     return timestamps
