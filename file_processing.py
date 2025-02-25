@@ -130,9 +130,8 @@ def read_timestamps(timestamps_file):
     with open(timestamps_file, 'r') as file:
         for line in file:
             parts = line.strip().split(',')
-            print(parts)
             if len(parts) == 2:
-                start = datetime.strptime(parts[0].strip(), '%Y-%m-%d %H:%M:%S.%f')
-                end = datetime.strptime(parts[1].strip(), '%Y-%m-%d %H:%M:%S.%f')
+                start = datetime.strptime(parts[0].strip(), '%Y-%m-%d %H:%M:%S')
+                end = datetime.strptime(parts[1].strip(), '%Y-%m-%d %H:%M:%S')
                 timestamps.append((start, end))
     return timestamps
