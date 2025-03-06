@@ -80,7 +80,7 @@ def clear_directory(directory):
                 os.remove(item_path)
 
 
-def process_file_by_timestamp(file_path, timestamps, output_dir):
+def process_file_by_timestamp(file_path, timestamps, output_dir, participant):
     """Process and save data from a file according to specified timestamp ranges into separate trial folders."""
     df = pd.read_csv(file_path)
 
@@ -107,21 +107,54 @@ def process_file_by_timestamp(file_path, timestamps, output_dir):
         mask = (pd.to_datetime(df[timestamp_column_converted]) >= start) & (pd.to_datetime(df[timestamp_column_converted]) <= end)
         filtered_data = df.loc[mask]
         if not filtered_data.empty:
-            trial_dir = os.path.join(output_dir, f'trial{trial_index}')
-            os.makedirs(trial_dir, exist_ok=True)
-            filtered_data.to_csv(os.path.join(trial_dir, os.path.basename(file_path)), index=False)
-            print(f"Processed and saved data for trial {trial_index} in {file_path}.")
+            db_filename = get_db_filename(file_path, participant, trial_index)
+            filtered_data.to_csv(os.path.join(output_dir, db_filename), index=False)
             trial_index += 1
 
 
-def process_directory_by_timestamps(data_dir, timestamps, output_dir):
+def get_db_filename(file_path, participant, trial_idx):
+    file_map = {
+        "eda": "eda",
+        "Polar": "polar",
+        "temperature": "temperature",
+        "tracklog": "tracklog",
+        "blinks": "blinks",
+        "mindMonitor": "mindMonitor",
+        "labels": "labels",
+        "gaze": "gaze",
+        "world": "world_timestamps",
+        "imu": "imu",
+        "blinks": "blinks",
+        "sections": "sections",
+        "3d": "3d_eye_states",
+        "events": "events",
+        "saccades": "saccades",
+        "enrichment": "enrichement",
+        "fixations": "fixations"
+    }
+
+    ''' Grab file name'''
+    file_name = file_path.rsplit('/', 1)[-1]
+
+    ''' Some file names have delimiters such as "_" or "-" or "." '''
+    paritioned_file_name = re.split(r'[-_.]', file_name)
+
+    file_map_key = paritioned_file_name[0]
+    file_extension = paritioned_file_name[-1]
+    db_value = f'{trial_idx}_{participant}_{file_map[file_map_key]}'
+
+
+    return db_value + '.' + file_extension
+
+
+def process_directory_by_timestamps(data_dir, timestamps, output_dir, participant):
     clear_directory(output_dir)
     """Process all CSV and TXT files within a directory according to the provided timestamps."""
     for root, dirs, files in os.walk(data_dir):
         for file_name in files:
             if file_name.endswith(('.csv', '.txt')) and not file_name.startswith('.') and 'metadata' not in file_name:
                 file_path = os.path.join(root, file_name)
-                process_file_by_timestamp(file_path, timestamps, output_dir)
+                process_file_by_timestamp(file_path, timestamps, output_dir, participant)
 
 
 def read_timestamps(timestamps_file):

@@ -19,7 +19,7 @@ def main():
                 avro_conversion(avro_file_path, raw_dir)
 
         process_directory_for_conversion(raw_dir)
-        process_directory_by_timestamps(raw_dir, timestamps, output_dir)
+        process_directory_by_timestamps(raw_dir, timestamps, output_dir, n)
 
 
 if __name__ == '__main__':
