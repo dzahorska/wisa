@@ -6,6 +6,7 @@ import pandas as pd
 from avro.datafile import DataFileReader
 from avro.io import DatumReader
 import csv
+import re
 
 
 def unzip_files(source_dir):
@@ -106,6 +107,7 @@ def process_file_by_timestamp(file_path, timestamps, output_dir, participant):
             timestamp_column_converted = f'{timestamp_column}_converted'
         mask = (pd.to_datetime(df[timestamp_column_converted]) >= start) & (pd.to_datetime(df[timestamp_column_converted]) <= end)
         filtered_data = df.loc[mask]
+        os.makedirs(output_dir, exist_ok=True)
         if not filtered_data.empty:
             db_filename = get_db_filename(file_path, participant, trial_index)
             filtered_data.to_csv(os.path.join(output_dir, db_filename), index=False)
@@ -164,7 +166,7 @@ def read_timestamps(timestamps_file):
         for line in file:
             parts = line.strip().split(',')
             if len(parts) == 2:
-                start = datetime.strptime(parts[0].strip(), '%Y-%m-%d %H:%M:%S')
-                end = datetime.strptime(parts[1].strip(), '%Y-%m-%d %H:%M:%S')
+                start = datetime.strptime(parts[0].strip(), '%Y-%m-%d %H:%M:%S.%f')
+                end = datetime.strptime(parts[1].strip(), '%Y-%m-%d %H:%M:%S.%f')
                 timestamps.append((start, end))
     return timestamps

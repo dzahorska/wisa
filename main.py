@@ -4,9 +4,9 @@ import os
 
 
 def main():
-    numbers_pilots = [9, 50, 77, 78, 99, 101]
+    numbers_pilots = [100]
     for n in numbers_pilots:
-        base_dir = f'/Users/dashazagorskaya/Canada/waterloo_project/{n}'
+        base_dir = f'/Users/kanishksk/Desktop/WISA/{n}'
         raw_dir = os.path.join(base_dir, 'raw')
         output_dir = os.path.join(base_dir, 'output')
         timestamps_file = os.path.join(base_dir, 'timestamps.txt')
