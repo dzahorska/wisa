@@ -81,7 +81,7 @@ def clear_directory(directory):
                 os.remove(item_path)
 
 
-def process_file_by_timestamp(file_path, timestamps, output_dir):
+def process_file_by_timestamp(file_path, timestamps, output_dir, participant):
     """Process and save data from a file according to specified timestamp ranges into separate trial folders."""
     df = pd.read_csv(file_path)
 
@@ -109,7 +109,7 @@ def process_file_by_timestamp(file_path, timestamps, output_dir):
         filtered_data = df.loc[mask]
         os.makedirs(output_dir, exist_ok=True)
         if not filtered_data.empty:
-            db_filename = get_db_filename(file_path, 100, trial_index)
+            db_filename = get_db_filename(file_path, participant, trial_index)
             filtered_data.to_csv(os.path.join(output_dir, db_filename), index=False)
             trial_index += 1
 
@@ -149,20 +149,14 @@ def get_db_filename(file_path, participant, trial_idx):
     return db_value + '.' + file_extension
 
 
-
-    
-
-
-
-
-def process_directory_by_timestamps(data_dir, timestamps, output_dir):
+def process_directory_by_timestamps(data_dir, timestamps, output_dir, participant):
     clear_directory(output_dir)
     """Process all CSV and TXT files within a directory according to the provided timestamps."""
     for root, dirs, files in os.walk(data_dir):
         for file_name in files:
             if file_name.endswith(('.csv', '.txt')) and not file_name.startswith('.') and 'metadata' not in file_name:
                 file_path = os.path.join(root, file_name)
-                process_file_by_timestamp(file_path, timestamps, output_dir)
+                process_file_by_timestamp(file_path, timestamps, output_dir, participant)
 
 
 def read_timestamps(timestamps_file):
