@@ -1,15 +1,16 @@
 from timestamps_formatting import process_directory as process_directory_for_conversion
-from file_processing import unzip_files, process_directory_by_timestamps, read_timestamps, avro_conversion
+from file_processing import unzip_files, process_directory_by_timestamps, read_timestamps, avro_conversion, process_instructor_file
 import os
 
 
 def main():
-    numbers_pilots = [100]
+    numbers_pilots = [37]
     for n in numbers_pilots:
         base_dir = f'/Users/kanishksk/Desktop/WISA/{n}'
         raw_dir = os.path.join(base_dir, 'raw')
         output_dir = os.path.join(base_dir, 'output')
         timestamps_file = os.path.join(base_dir, 'timestamps.txt')
+        instructor_rate_file = os.path.join(base_dir, 'instructor_rate.xlsx')
         timestamps = read_timestamps(timestamps_file)
 
         unzip_files(raw_dir)
@@ -20,6 +21,8 @@ def main():
 
         process_directory_for_conversion(raw_dir)
         process_directory_by_timestamps(raw_dir, timestamps, output_dir, n)
+        process_instructor_file(instructor_rate_file, output_dir, n)
+
 
 
 if __name__ == '__main__':

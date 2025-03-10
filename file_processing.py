@@ -7,6 +7,8 @@ from avro.datafile import DataFileReader
 from avro.io import DatumReader
 import csv
 import re
+from openpyxl import load_workbook, Workbook
+
 
 
 def unzip_files(source_dir):
@@ -170,3 +172,37 @@ def read_timestamps(timestamps_file):
                 end = datetime.strptime(parts[1].strip(), '%Y-%m-%d %H:%M:%S.%f')
                 timestamps.append((start, end))
     return timestamps
+
+
+def process_instructor_file(file_path, output_dir, pilot):
+    action_to_trial = {
+        "general": "master",
+        "normal takeoff": 2,
+        "steep turn": 3,
+        "stall (power on)": 4,
+        "normal approach and landing": 5,
+        "circuit": 6
+    }
+
+    wb = load_workbook(file_path)
+
+    for sheet in wb.sheetnames:
+        lower_name = sheet.lower().strip().lower()
+        if lower_name in action_to_trial:
+            new_name = f"{action_to_trial[lower_name]}_{pilot}_instructor_sheet.csv"
+            print(f"Processing instructor file for ${pilot} with ${lower_name}, new file name: ${new_name}")
+            new_file_path = os.path.join(output_dir, new_name)
+
+            with open(new_file_path, mode="w", newline="") as csv_file:
+                writer = csv.writer(csv_file)
+
+                original_ws = wb[sheet]
+                for row in original_ws.iter_rows(values_only=True):
+                    writer.writerow(row)
+
+
+            print(f"Saved: {new_file_path}")
+
+    print(f"All sheets for {file_path} and {pilot} processed successfully")
+    
+
