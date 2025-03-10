@@ -176,6 +176,7 @@ def read_timestamps(timestamps_file):
 
 def process_instructor_file(file_path, output_dir, pilot):
     action_to_trial = {
+        "general": "master",
         "normal takeoff": 2,
         "steep turn": 3,
         "stall (power on)": 4,
