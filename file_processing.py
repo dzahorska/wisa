@@ -188,19 +188,18 @@ def process_instructor_file(file_path, output_dir, pilot):
     for sheet in wb.sheetnames:
         lower_name = sheet.lower().strip().lower()
         if lower_name in action_to_trial:
-            new_name = f"{action_to_trial[lower_name]}_{pilot}_instructor_sheet.xlsx"
+            new_name = f"{action_to_trial[lower_name]}_{pilot}_instructor_sheet.csv"
             print(f"Processing instructor file for ${pilot} with ${lower_name}, new file name: ${new_name}")
             new_file_path = os.path.join(output_dir, new_name)
 
-            new_wb = Workbook()
-            new_ws = new_wb.active
-            new_ws.title = sheet
+            with open(new_file_path, mode="w", newline="") as csv_file:
+                writer = csv.writer(csv_file)
 
-            original_ws = wb[sheet]
-            for row in original_ws.iter_rows(values_only=True):
-                new_ws.append(row)
-            
-            new_wb.save(new_file_path)
+                original_ws = wb[sheet]
+                for row in original_ws.iter_rows(values_only=True):
+                    writer.writerow(row)
+
+
             print(f"Saved: {new_file_path}")
 
     print(f"All sheets for {file_path} and {pilot} processed successfully")
