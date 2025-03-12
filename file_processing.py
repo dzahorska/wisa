@@ -138,7 +138,7 @@ def get_db_filename(file_path, participant, trial_idx):
     }
 
     ''' Grab file name'''
-    file_name = file_path.rsplit('/', 1)[-1]
+    file_name = os.path.basename(file_path)
 
     ''' Some file names have delimiters such as "_" or "-" or "." '''
     paritioned_file_name = re.split(r'[-_.]', file_name)
