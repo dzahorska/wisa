@@ -23,6 +23,23 @@ def unzip_files(source_dir):
             os.remove(file_path)
             flatten_directory_structure(extract_to_path)
 
+def merge_sensor_files(data_dir, prefix, output_file):
+    all_files = [os.path.join(data_dir, f) for f in os.listdir(data_dir)
+                 if f.startswith(prefix) and f.endswith('.csv')]
+
+    df_list = []
+    for file in all_files:
+        df = pd.read_csv(file)
+        df_list.append(df)
+
+    if df_list:
+        merged_df = pd.concat(df_list, ignore_index=True)
+        merged_df.sort_values(by='unix_timestamp', inplace=True)
+        merged_df.to_csv(output_file, index=False)
+        print(f"Merged {prefix} files into {output_file}")
+    else:
+        print(f"No {prefix} files found to merge.")
+
 
 def avro_conversion(avro_file, output):
     # Open the Avro file for reading

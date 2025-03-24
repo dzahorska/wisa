@@ -1,5 +1,5 @@
 from timestamps_formatting import process_directory as process_directory_for_conversion
-from file_processing import unzip_files, process_directory_by_timestamps, read_timestamps, avro_conversion, process_instructor_file
+from file_processing import unzip_files, process_directory_by_timestamps, read_timestamps, avro_conversion, merge_sensor_files
 import os
 
 
@@ -20,9 +20,10 @@ def main():
                 avro_conversion(avro_file_path, raw_dir)
 
         process_directory_for_conversion(raw_dir)
-        process_directory_by_timestamps(raw_dir, timestamps, output_dir, n)
-        process_instructor_file(instructor_rate_file, output_dir, n)
+        merge_sensor_files(raw_dir, 'eda', os.path.join(raw_dir, 'merged_eda.csv'))
+        merge_sensor_files(raw_dir, 'temperature', os.path.join(raw_dir, 'merged_temperature.csv'))
 
+        process_directory_by_timestamps(raw_dir, timestamps, output_dir)
 
 
 if __name__ == '__main__':
