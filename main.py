@@ -1,10 +1,10 @@
 from timestamps_formatting import process_directory as process_directory_for_conversion
-from file_processing import unzip_files, process_directory_by_timestamps, read_timestamps, avro_conversion, merge_sensor_files
+from file_processing import unzip_files, process_directory_by_timestamps, read_timestamps, avro_conversion, merge_sensor_files, process_instructor_file
 import os
 
 
 def main():
-    numbers_pilots = [37]
+    numbers_pilots = [88]
     for n in numbers_pilots:
         base_dir = f'/Users/kanishksk/Desktop/WISA/{n}'
         raw_dir = os.path.join(base_dir, 'raw')
@@ -20,10 +20,11 @@ def main():
                 avro_conversion(avro_file_path, raw_dir)
 
         process_directory_for_conversion(raw_dir)
-        merge_sensor_files(raw_dir, 'eda', os.path.join(raw_dir, 'merged_eda.csv'))
-        merge_sensor_files(raw_dir, 'temperature', os.path.join(raw_dir, 'merged_temperature.csv'))
+        merge_sensor_files(raw_dir, 'eda', os.path.join(raw_dir, 'edaMerged.csv'))
+        merge_sensor_files(raw_dir, 'temperature', os.path.join(raw_dir, 'temperatureMerged.csv'))
+        process_directory_by_timestamps(raw_dir, timestamps, output_dir, n)
 
-        process_directory_by_timestamps(raw_dir, timestamps, output_dir)
+        process_instructor_file(instructor_rate_file, output_dir, n)
 
 
 if __name__ == '__main__':
