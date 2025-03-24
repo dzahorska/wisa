@@ -129,13 +129,15 @@ def process_file_by_timestamp(file_path, timestamps, output_dir, participant):
         os.makedirs(output_dir, exist_ok=True)
         if not filtered_data.empty:
             db_filename = get_db_filename(file_path, participant, trial_index)
-            filtered_data.to_csv(os.path.join(output_dir, db_filename), index=False)
-            trial_index += 1
+            if db_filename:
+                filtered_data.to_csv(os.path.join(output_dir, db_filename), index=False)
+                trial_index += 1
 
 
 def get_db_filename(file_path, participant, trial_idx):
     file_map = {
         "eda": "eda",
+        "edaMerged": "eda_merged",
         "Polar": "polar",
         "temperature": "temperature",
         "tracklog": "tracklog",
@@ -151,7 +153,8 @@ def get_db_filename(file_path, participant, trial_idx):
         "events": "events",
         "saccades": "saccades",
         "enrichment": "enrichement",
-        "fixations": "fixations"
+        "fixations": "fixations",
+        "temperatureMerged": "temperature_merged"
     }
 
     ''' Grab file name'''
@@ -161,6 +164,9 @@ def get_db_filename(file_path, participant, trial_idx):
     paritioned_file_name = re.split(r'[-_.]', file_name)
 
     file_map_key = paritioned_file_name[0]
+
+    if file_map_key in ["temperature", "eda"]: return
+    
     file_extension = paritioned_file_name[-1]
     db_value = f'{trial_idx}_{participant}_{file_map[file_map_key]}'
 
