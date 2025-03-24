@@ -4,7 +4,7 @@ import os
 
 
 def main():
-    numbers_pilots = [12, 16, 22, 30, 37, 44, 47, 72, 73, 86, 88, 102]
+    numbers_pilots = [102]
     for n in numbers_pilots:
         base_dir = f'/Users/kanishksk/Desktop/WISA/{n}'
         raw_dir = os.path.join(base_dir, 'raw')

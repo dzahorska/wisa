@@ -124,14 +124,16 @@ def process_file_by_timestamp(file_path, timestamps, output_dir, participant):
             timestamp_column_converted = timestamp_column
         else:
             timestamp_column_converted = f'{timestamp_column}_converted'
+
         mask = (pd.to_datetime(df[timestamp_column_converted]) >= start) & (pd.to_datetime(df[timestamp_column_converted]) <= end)
         filtered_data = df.loc[mask]
+
         os.makedirs(output_dir, exist_ok=True)
         if not filtered_data.empty:
             db_filename = get_db_filename(file_path, participant, trial_index)
             if db_filename:
                 filtered_data.to_csv(os.path.join(output_dir, db_filename), index=False)
-                trial_index += 1
+        trial_index += 1
 
 
 def get_db_filename(file_path, participant, trial_idx):
