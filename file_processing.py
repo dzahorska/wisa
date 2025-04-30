@@ -107,7 +107,7 @@ def process_file_by_timestamp(file_path, timestamps, output_dir, participant):
     # Define the list of possible timestamp columns
     possible_timestamp_columns = [
         'start timestamp [ns]', 'timestamp', 'Timestamp', 'Phone timestamp',
-        'timestamp_unix', 'timestamp [ns]', 'TimeStamp', 'unix_timestamp'
+        'timestamp_unix', 'timestamp [ns]', 'TimeStamp', 'unix_timestamp',
     ]
 
     # Identify the correct timestamp column from the list of possibilities
@@ -127,6 +127,9 @@ def process_file_by_timestamp(file_path, timestamps, output_dir, participant):
 
         mask = (pd.to_datetime(df[timestamp_column_converted]) >= start) & (pd.to_datetime(df[timestamp_column_converted]) <= end)
         filtered_data = df.loc[mask]
+
+        if 'tracklog' in file_path:
+            print(filtered_data)
 
         os.makedirs(output_dir, exist_ok=True)
         if not filtered_data.empty:
